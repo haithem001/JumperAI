@@ -49,7 +49,7 @@ class DDQN(object):
         self.batch_size = 64
         self.episode_counter = 0
         self.target_net.load_state_dict(self.eval_net.state_dict())
-        self.dx=0
+        self.dx = 0
 
     def memory_store(self, s0, a0, r, s1, sign):
         transition = np.concatenate((s0, [a0, r], s1, [sign]))
@@ -137,7 +137,7 @@ class Game:
             pygame.Rect(self.w / 2 - 200, self.h - 350, 120, 10),  # Platform 2 (Wider)
             pygame.Rect(self.w - 30, self.h - 450, 100, 10),  # Platform 3
             pygame.Rect(self.w / 2 + 150, self.h - 600, 70, 10),  # Platform 4 (Narrower)
-            pygame.Rect(self.w / 2 - 250, self.h - 550, 100, 10),  # Platform 5 (Wider)
+            pygame.Rect(self.w / 2 - 350, self.h - 550, 100, 10),  # Platform 5 (Wider)
             pygame.Rect(600, self.h - 700, 120, 10),  # Platform 6 (Wider)
             pygame.Rect(400, self.h - 700, 80, 10),  # Platform 7 (Narrower)
             pygame.Rect(self.w - 30, self.h - 800, 100, 10),  # Platform 8
@@ -217,11 +217,18 @@ class Game:
             if self.D.y > height:
                 self.D = pygame.Rect(self.w / 2, self.h - 200, 60, 60)
 
+
             if self.D.y > old_y:
                 reward = 0
+                exit=False
+            elif self.D.x > self.w - self.D.w - 7 or self.D.x < 7:
+
+                reward = 1
+                exit=True
+
 
             else:
-
+                exit=False
                 self.visited[(self.D.y)] = self.visited.get((self.D.y), 0) + 1
                 try:
                     if self.visited[self.D.y] < self.visited[old_y]:
@@ -230,8 +237,9 @@ class Game:
                     pass
 
                 reward = -self.visited[self.D.y]
+                print(reward)
 
-            done = True if self.step_counter > self.max_step else False
+            done = True if (self.step_counter > self.max_step) or (exit ==True) else False
             return state, reward, done
 
     # MOOD
@@ -241,19 +249,19 @@ class Game:
         self.direction = clock_wise[action]
         if self.direction == Direction.UP_RIGHT and not self.is_jumping:
             self.D.x += 7
-            self.dx=7
+            self.dx = 7
             self.is_jumping = True
             self.velocity = -self.jump_height
             self.on_ground = False
         elif self.direction == Direction.UP_LEFT and not self.is_jumping:
             self.D.x -= 7
-            self.dx=-7
+            self.dx = -7
 
             self.is_jumping = True
             self.velocity = -self.jump_height
             self.on_ground = False
 
-        elif self.direction == Direction.RIGHT :
+        elif self.direction == Direction.RIGHT:
             if not self.is_jumping:
                 self.D.x += 7
 
@@ -264,10 +272,9 @@ class Game:
 
         if not self.on_ground:
             if self.is_jumping:
-                self.D.x+=self.dx
+                self.D.x += self.dx
             self.velocity += 0.5
             self.D.y += self.velocity
-
 
         # Apply gravity
         if not self.on_ground:
