@@ -3,19 +3,21 @@ from enum import Enum
 
 import torch.nn
 import numpy as np
+
 BLACK = (0, 0, 0)
 White = (255, 255, 255)
-Red = (255,0,0)
+Red = (255, 0, 0)
 width = 900
 height = 900
+
 
 #		state = [self.king.x, self.king.y]
 
 class NETWORK(torch.nn.Module):
-    def __init__(self, input_dim:int, output_dim:int, hidden_dim:int)->None:
-        super(NETWORK,self).__init__()
+    def __init__(self, input_dim: int, output_dim: int, hidden_dim: int) -> None:
+        super(NETWORK, self).__init__()
         self.layer1 = torch.nn.Sequential(
-            torch.nn.Linear(input_dim, hidden_dim),torch.nn.ReLU()
+            torch.nn.Linear(input_dim, hidden_dim), torch.nn.ReLU()
         )
         self.layer2 = torch.nn.Sequential(
             torch.nn.Linear(hidden_dim, hidden_dim),
@@ -23,11 +25,12 @@ class NETWORK(torch.nn.Module):
         )
         self.final = torch.nn.Linear(hidden_dim, output_dim)
 
-    def forward(self, x:torch.Tensor)-> torch.Tensor:
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.layer1(x)
         x = self.layer2(x)
         x = self.final(x)
         return x
+
 
 class DDQN(object):
     def __init__(self):
@@ -51,7 +54,7 @@ class DDQN(object):
         self.memory[index, :] = transition
         self.memory_counter += 1
 
-    def select_action(self, states:np.ndarray) -> int:
+    def select_action(self, states: np.ndarray) -> int:
         state = torch.unsqueeze(torch.tensor(states).float(), 0)
         if np.random.uniform() > self.epsilon:
             logit = self.eval_net(state)
@@ -59,11 +62,13 @@ class DDQN(object):
         else:
             action = int(np.random.choice(4, 1))
         return action
-    def policy(self, states: np.ndarray)-> int:
+
+    def policy(self, states: np.ndarray) -> int:
         state = torch.unsqueeze(torch.tensor(states).float(), 0)
         logit = self.eval_net(state)
         action = torch.argmax(logit, 1).item()
         return action
+
     def train(self, s0, a0, r, s1, sign):
         if sign == 1:
             if self.episode_counter % 2 == 0:
@@ -77,7 +82,7 @@ class DDQN(object):
         else:
             batch_index = np.random.choice(self.memory_counter, size=self.batch_size)
         batch_memory = self.memory[batch_index]
-        #state has 2 values/(maybe change it to 4 later)
+        # state has 2 values/(maybe change it to 4 later)
         batch_s0 = torch.tensor(batch_memory[:, :2]).float()
         batch_a0 = torch.tensor(batch_memory[:, 2:3]).float()
         batch_r = torch.tensor(batch_memory[:, 3:4]).float()
@@ -95,8 +100,6 @@ class DDQN(object):
         self.optimizer.step()
 
 
-
-
 class Direction(Enum):
     RIGHT = 1
     LEFT = 2
@@ -105,7 +108,7 @@ class Direction(Enum):
 
 
 class Game:
-    def set_text(self,string, coordx, coordy, fontSize):  # Function to set text
+    def set_text(self, string, coordx, coordy, fontSize):  # Function to set text
 
         font = pygame.font.Font('04B_30__.TTF', fontSize)
         # (0, 0, 0) is black, to make black text
@@ -114,7 +117,7 @@ class Game:
         textRect.center = (coordx, coordy)
         return (text, textRect)
 
-    def __init__(self, max_step = float('inf')):
+    def __init__(self, max_step=float('inf')):
         self.w = width
         self.h = height
         self.D = pygame.Rect(self.w / 2, self.h - 200, 60, 60)
@@ -137,7 +140,7 @@ class Game:
             pygame.Rect(self.w - 30, self.h - 800, 100, 10),  # Platform 8
             pygame.Rect(0, self.h - 700, 100, 10),  # Platform 9
             pygame.Rect(0, self.h - 450, 100, 10),  # Platform 10
-            pygame.Rect(self.w / 2 - 20, self.h - 140, 100, 10)  # Platform 11
+            pygame.Rect(0, self.h - 140, self.w, 10)  # Platform 11
         ]
         self.ListofListofThem = self.ListOfThem.copy()
         self.reset()
@@ -148,10 +151,10 @@ class Game:
         self.jump_height = 15
         self.game_over = False
 
-    def draw_text(self,text, text_col, x, y):
-        font = pygame.font.Font("04B_30__.TTF",24)
+    def draw_text(self, text, text_col, x, y):
+        font = pygame.font.Font("04B_30__.TTF", 24)
         img = font.render(text, True, text_col)
-        self.display.blit(img,(x,y))
+        self.display.blit(img, (x, y))
 
     def Collisions(self, Tile):
         if (self.D.x < Tile.x + Tile.w and
@@ -166,7 +169,7 @@ class Game:
                 self.D.x = Tile.x - self.D.w
 
 
-            elif (Tile.y - self.D.y < self.D.h) and not (Tile.x > self.D.x - Tile.w + 5):
+            elif (Tile.y - self.D.y < self.D.h) and not (Tile.x > self.D.x - Tile.w + 7):
                 self.D.x = Tile.x + Tile.w
 
             elif (self.D.y + self.D.h >= Tile.y) and (self.D.y < Tile.y):
@@ -178,9 +181,6 @@ class Game:
                 if self.D.y > self.h - 200:
                     self.velocity += 0.5  # Increase velocity due to gravity
                     self.D.y += self.velocity
-
-
-
 
     def reset(self):
         self.step_counter = 0
@@ -194,6 +194,7 @@ class Game:
         self.ListofListofThem = self.ListOfThem.copy()
         self.Tile = None
         return done, state
+
     # MOOD
     def play_step(self, action):
         old_y = self.D.y
@@ -204,7 +205,6 @@ class Game:
                 quit()
 
         self._move(action)
-
 
         self.clock.tick(60)
         while True:
@@ -219,10 +219,10 @@ class Game:
 
             else:
 
-                self.visited[(self.D.y)] = self.visited.get((self.D.y),0)+1
+                self.visited[(self.D.y)] = self.visited.get((self.D.y), 0) + 1
                 try:
                     if self.visited[self.D.y] < self.visited[old_y]:
-                        self.visited[self.D.y] = self.visited[old_y]+1
+                        self.visited[self.D.y] = self.visited[old_y] + 1
                 except:
                     pass
 
@@ -234,7 +234,6 @@ class Game:
     # MOOD
     def _move(self, action):
         clock_wise = [Direction.UP_RIGHT, Direction.UP_LEFT, Direction.RIGHT, Direction.LEFT]
-
 
         self.direction = clock_wise[action]
         if self.direction == Direction.UP_RIGHT and not self.is_jumping:
@@ -268,24 +267,23 @@ class Game:
             for i in self.ListOfThem:
                 self.Collisions(i)
 
-
         # Keep the character within the game boundaries
         if self.D.x < 0:
             self.D.x = 0
         elif self.D.x > self.w - 60:
             self.D.x = self.w - 60
 
-
     def _update_ui(self):
         self.display.fill(BLACK)
         for i in self.ListOfThem:
             pygame.draw.rect(self.display, White, i)
-        Show = self.set_text("MOTHER FUCKER", self.w/2, 40, 20)
+        Show = self.set_text("MOTHER FUCKER", self.w / 2, 40, 20)
         self.display.blit(Show[0], Show[1])
 
         pygame.draw.rect(self.display, White, self.D)
 
         pygame.display.flip()
+
 
 def train():
     agent = DDQN()
