@@ -1,3 +1,5 @@
+import math
+
 import pygame
 from enum import Enum
 
@@ -47,6 +49,7 @@ class DDQN(object):
         self.batch_size = 64
         self.episode_counter = 0
         self.target_net.load_state_dict(self.eval_net.state_dict())
+        self.dx=0
 
     def memory_store(self, s0, a0, r, s1, sign):
         transition = np.concatenate((s0, [a0, r], s1, [sign]))
@@ -165,7 +168,7 @@ class Game:
 
             self.is_jumping = True
 
-            if (Tile.y - self.D.y < self.D.h) and not (Tile.x - 55 < self.D.x):
+            if (Tile.y - self.D.y < self.D.h) and not (Tile.x - 53 < self.D.x):
                 self.D.x = Tile.x - self.D.w
 
 
@@ -238,16 +241,19 @@ class Game:
         self.direction = clock_wise[action]
         if self.direction == Direction.UP_RIGHT and not self.is_jumping:
             self.D.x += 7
+            self.dx=7
             self.is_jumping = True
             self.velocity = -self.jump_height
             self.on_ground = False
         elif self.direction == Direction.UP_LEFT and not self.is_jumping:
             self.D.x -= 7
+            self.dx=-7
+
             self.is_jumping = True
             self.velocity = -self.jump_height
             self.on_ground = False
 
-        elif self.direction == Direction.RIGHT:
+        elif self.direction == Direction.RIGHT :
             if not self.is_jumping:
                 self.D.x += 7
 
@@ -257,8 +263,11 @@ class Game:
                 self.D.x -= 7
 
         if not self.on_ground:
+            if self.is_jumping:
+                self.D.x+=self.dx
             self.velocity += 0.5
             self.D.y += self.velocity
+
 
         # Apply gravity
         if not self.on_ground:
