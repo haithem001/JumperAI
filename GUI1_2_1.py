@@ -314,7 +314,6 @@ def train(genomes, config):
                 sign = 1 if done else 0
                 agents[j].train(state, action, reward, next_state, sign)
                 state = next_state
-                genomes[j][1].fitness += reward
             print(f'episode: {i}, reward: {running_reward}')
 
 
