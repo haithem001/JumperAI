@@ -150,6 +150,8 @@ class Game:
         self.char = pygame.transform.scale(self.char, (60, 60))
         self.x = pygame.image.load("430306741_263134090199334_349620565060820910_n.png").convert()
         self.x = pygame.transform.scale(self.x, (100, 20))
+        self.background = pygame.image.load("img_3.png").convert()
+        self.background = pygame.transform.scale(self.background,(900,900))
         self.velocity = 0
         self.on_ground = False
         self.is_jumping = False
@@ -286,6 +288,7 @@ class Game:
 
     def _update_ui(self):
         self.display.fill(BLACK)
+        self.display.blit(self.background, (0, 0))
         for i in self.ListOfThem:
             pygame.draw.rect(self.display, White, i)
         for i in range(len(self.ListOfThem)-1):
