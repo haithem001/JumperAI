@@ -146,7 +146,10 @@ class Game:
         ]
         self.ListofListofThem = self.ListOfThem.copy()
         self.reset()
-
+        self.char = pygame.image.load("img_2.png").convert()
+        self.char = pygame.transform.scale(self.char, (60, 60))
+        self.x = pygame.image.load("430306741_263134090199334_349620565060820910_n.png").convert()
+        self.x = pygame.transform.scale(self.x, (100, 20))
         self.velocity = 0
         self.on_ground = False
         self.is_jumping = False
@@ -174,7 +177,7 @@ class Game:
             elif (Tile.y - self.D.y < self.D.h) and not (Tile.x > self.D.x - Tile.w + 8):
                 self.D.x = Tile.x + Tile.w
 
-            elif (self.D.y + self.D.h >= Tile.y) and (self.D.y < Tile.y):
+            elif (self.D.y + self.D.h > Tile.y) and (self.D.y < Tile.y):
                 self.Tile = Tile
                 self.D.y = Tile.y - self.D.h
                 self.is_jumping = False
@@ -285,10 +288,13 @@ class Game:
         self.display.fill(BLACK)
         for i in self.ListOfThem:
             pygame.draw.rect(self.display, White, i)
+        for i in range(len(self.ListOfThem)-1):
+            self.display.blit(self.x, (self.ListOfThem[i].x, self.ListOfThem[i].y))
         Show = self.set_text("MOTHER FUCKER", self.w / 2, 40, 20)
         self.display.blit(Show[0], Show[1])
 
         pygame.draw.rect(self.display, White, self.D)
+        self.display.blit(self.char, (self.D.x, self.D.y))
 
         pygame.display.flip()
 
