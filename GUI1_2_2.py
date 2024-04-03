@@ -136,7 +136,7 @@ class Game:
         self.ListOfThem = [
             pygame.Rect(260, 550, 100, 20),  # 1
             pygame.Rect(500, 600, 100, 20),  # 2
-            pygame.Rect(750, 500, 100, 20),  # 3
+            pygame.Rect(700, 500, 100, 20),  # 3
             pygame.Rect(20, 460, 100, 20),  # 4
             pygame.Rect(300, 310, 100, 20),  # 5
             pygame.Rect(550, 310, 100, 20),  # 6
@@ -148,10 +148,12 @@ class Game:
         self.reset()
         self.char = pygame.image.load("img_2.png").convert()
         self.char = pygame.transform.scale(self.char, (60, 60))
-        self.x = pygame.image.load("430306741_263134090199334_349620565060820910_n.png").convert()
+        self.x = pygame.image.load("img_4.png").convert_alpha()
         self.x = pygame.transform.scale(self.x, (100, 20))
         self.background = pygame.image.load("img_3.png").convert()
-        self.background = pygame.transform.scale(self.background,(900,900))
+        self.background = pygame.transform.scale(self.background, (900, 900))
+        self.ground = pygame.image.load("img_5.png").convert()
+        self.ground = pygame.transform.scale(self.ground, (900, 20))
         self.velocity = 0
         self.on_ground = False
         self.is_jumping = False
@@ -292,12 +294,13 @@ class Game:
         for i in self.ListOfThem:
             pygame.draw.rect(self.display, White, i)
         for i in range(len(self.ListOfThem)-1):
-            self.display.blit(self.x, (self.ListOfThem[i].x, self.ListOfThem[i].y))
+            self.display.blit(self.x, self.ListOfThem[i])
+        self.display.blit(self.ground, self.ListOfThem[-1])
         Show = self.set_text("MOTHER FUCKER", self.w / 2, 40, 20)
         self.display.blit(Show[0], Show[1])
 
         pygame.draw.rect(self.display, White, self.D)
-        self.display.blit(self.char, (self.D.x, self.D.y))
+        self.display.blit(self.char, self.D)
 
         pygame.display.flip()
 
